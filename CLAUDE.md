@@ -229,3 +229,79 @@ Add a section: "Add your agent"
 Show how to write a 20-line scanner class to support a new agent.
 This invites contributions from Cursor users, Factory users, Kiro users, etc.
 Each contributed scanner = that agent's community discovers agentkit.
+
+## PART 3 — Real-time ghost text suggestions (PRIORITY — build this next)
+
+### What it is
+A wrapper CLI called `akit` that replaces typing `claude` directly.
+User types `akit` → gets a custom prompt input → as they type their prompt,
+ghost text appears AFTER their cursor in gray showing best tool suggestion.
+Suggestion updates on every keystroke. On Enter — real `claude` runs with their prompt.
+
+### Tech: prompt_toolkit
+Use Python `prompt_toolkit` library — same library fish shell uses for ghost completions.
+It has native AutoSuggest support that shows dimmed text after cursor.
+
+```python
+from prompt_toolkit import PromptSession
+from prompt_toolkit.auto_suggest import AutoSuggest, Suggestion
+
+class ToolSuggest(AutoSuggest):
+    def get_suggestion(self, buffer, document):
+        text = document.text
+        if len(text) < 3:
+            return None
+        tools = suggest(text, catalog, top_n=1)
+        if tools:
+            return Suggestion(f"  →  {tools[0].invoke}")
+        return None
+```
+
+### UX behavior
+- Fewer than 3 chars typed: no suggestion
+- 3+ chars: gray ghost text after cursor: `  →  /review`
+- Multiple tools: `  →  /review, /cso`
+- User keeps typing: suggestion updates live every keystroke
+- Tab: accepts suggestion (appends it to prompt? or just shows it?)
+- Enter: runs real claude with the original prompt (NOT the suggestion — suggestion is informational only)
+- Ctrl+C: exits
+
+### The akit command flow
+```
+akit                    → launches custom prompt session with ghost suggestions
+akit -p "task"          → passes directly to claude -p (no interactive, no suggestions needed)
+akit --install-alias    → adds `alias claude=akit` to ~/.zshrc
+```
+
+### After prompt submitted
+1. Show which tool was suggested (brief flash: "💡 Suggested: /review")
+2. Launch real claude with the user's prompt: `os.execvp("claude", ["claude"] + original_args)`
+3. `execvp` replaces the process — user is now inside real Claude Code, no wrapper overhead
+
+### Add to pyproject.toml entry points
+```
+[project.scripts]
+agentkit = "agentkit.cli:main"
+akit = "agentkit.wrapper:main"
+```
+
+### File to create: agentkit/wrapper.py
+Full prompt_toolkit session with ToolSuggest class.
+Load catalog once at startup (fast — filesystem scan ~100ms).
+Pass all sys.argv after prompt to real claude binary.
+
+### Dependencies to add to pyproject.toml
+```
+"prompt_toolkit>=3.0",
+```
+
+### Test
+```
+pip install -e .
+akit
+# Type "check my code" → should see →  /review in gray after cursor
+# Type "security audit" → should see →  /cso in gray
+# Press Enter → real claude launches
+```
+
+### DO NOT break existing agentkit command. This is additive only.

@@ -17,10 +17,12 @@ dependencies = [
     "click>=8.0.0",
     "python-frontmatter>=1.0.0",
     "rapidfuzz>=3.0.0",
+    "prompt_toolkit>=3.0.0",
 ]
 
 [project.scripts]
 agentkit = "agentkit.cli:main"
+akit = "agentkit.wrapper:main"
 
 [project.optional-dependencies]
 dev = [
