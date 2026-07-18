@@ -15,11 +15,14 @@ from .installer import install_hook
 from .hook import handle_user_prompt_submit
 
 
-@click.group()
+@click.group(invoke_without_command=True)
 @click.version_option(__version__)
-def main():
+@click.pass_context
+def main(ctx):
     """AgentKit — Discover AI coding tools and agents."""
-    pass
+    if ctx.invoked_subcommand is None:
+        # No subcommand: show all tools
+        ctx.invoke(show)
 
 
 @main.command()
