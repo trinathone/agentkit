@@ -4,6 +4,8 @@
 
 **AgentKit** is a CLI toolkit for discovering AI coding tools and agents. It auto-detects everything you have installed across Claude Code, Codex, gstack, Hermes, and MCP servers — then suggests the right tool as you type.
 
+![AgentKit TUI — 482 tools detected, categorized, searchable](docs/assets/agentkit-tui.png)
+
 ## Problem
 
 Developers using Claude Code, Codex, gstack, or Cursor have 50–200 tools/skills/agents available. They forget 80% of them. When stuck, they guess or Google instead of using the right tool.
@@ -65,6 +67,8 @@ Press Tab to accept, Esc to dismiss
 ```
 
 Installs a hook into Claude Code that fuzzy-matches your prompt against all available tools.
+
+![akit ghost text — suggestions appear after cursor as you type](docs/assets/akit-ghost.png)
 
 ### 3. JSON Output
 
