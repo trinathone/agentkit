@@ -28,8 +28,8 @@ class ToolSuggest(AutoSuggest):
         if len(text) < 3:
             return None
 
-        # Get top suggestion
-        results = suggest(self.catalog, text, top_n=1, min_score=0.4)
+        # Get top suggestion (use lower min_score for interactive mode)
+        results = suggest(self.catalog, text, top_n=1, min_score=0.25)
         if not results:
             return None
 

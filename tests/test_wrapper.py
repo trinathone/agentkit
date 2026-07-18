@@ -36,7 +36,7 @@ def test_tool_suggest_no_suggestion_too_short():
 def test_tool_suggest_returns_suggestion():
     """Test that suggestion is returned for matching text."""
     tools = [
-        Tool("Review", "gstack", "💻 Code", "Code review tool for finding bugs"),
+        Tool("/review", "gstack", "💻 Code", "Code review tool for finding bugs"),
     ]
     catalog = Catalog(tools)
     suggester = ToolSuggest(catalog)
@@ -48,7 +48,7 @@ def test_tool_suggest_returns_suggestion():
 
     assert suggestion is not None
     assert "→" in suggestion.text  # Contains arrow
-    assert "Review" in suggestion.text or "review" in suggestion.text.lower()
+    assert "/review" in suggestion.text or "review" in suggestion.text.lower()
 
 
 def test_tool_suggest_format():
